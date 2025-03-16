@@ -18,6 +18,5 @@ class TestTextNode(unittest.TestCase):
         node = TextNode("This is a test node", TextType.BOLD)
         self.assertIsNone(node.url)
 
-
 if __name__ == "__main__":
     unittest.main()
