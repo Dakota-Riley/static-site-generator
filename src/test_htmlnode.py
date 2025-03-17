@@ -1,8 +1,11 @@
 import unittest
 
-from htmlnode import HTMLNode, LeafNode
+from htmlnode import HTMLNode, LeafNode, ParentNode
 
 class TestHTMLNode(unittest.TestCase):
+
+    # Tests for the HTMLNode
+
     def test_props_to_html_empty(self):
         node = HTMLNode()
         self.assertEqual(node.props_to_html(), "")
@@ -19,6 +22,8 @@ class TestHTMLNode(unittest.TestCase):
             ' target="_blank" href="https://www.google.com"'
         ]
         self.assertIn(node.props_to_html(), possible_results)
+
+    # Tests for the LeafNode
     
     def test_leaf_to_html_p(self):
         node = LeafNode("p", "Hello, world!")
@@ -39,6 +44,36 @@ class TestHTMLNode(unittest.TestCase):
     def test_leaf_to_html_a(self):
         node = LeafNode("a", "Hello, world!")
         self.assertEqual(node.to_html(), "<a>Hello, world!</a>")
+
+    # Tests for the ParentNode
+
+    def test_to_html_with_children(self):
+        child_node = LeafNode("span", "child")
+        parent_node = ParentNode("div", [child_node])
+        self.assertEqual(parent_node.to_html(), "<div><span>child</span></div>")
+
+    def test_to_html_with_grandchildren(self):
+        grandchild_node = LeafNode("b", "grandchild")
+        child_node = ParentNode("span", [grandchild_node])
+        parent_node = ParentNode("div", [child_node])
+        self.assertEqual(
+            parent_node.to_html(),
+            "<div><span><b>grandchild</b></span></div>",
+        )
+
+    def test_to_html_with_empty_tag(self):
+        child_node = LeafNode("div", "child")
+        parent_node = ParentNode("", [child_node])
+        with self.assertRaises(ValueError) as context:
+            parent_node.to_html()
+        self.assertEqual(str(context.exception), "Parent node must have a non-empty tag.")
+
+    def test_to_html_with_no_child(self):
+        child_node = LeafNode("div", "child")
+        parent_node = ParentNode("span", "")
+        with self.assertRaises(ValueError) as context:
+            parent_node.to_html()
+        self.assertEqual(str(context.exception), "Parent node must have non-empty children.")
 
 if __name__ == "__main__":
     unittest.main()
