@@ -1,6 +1,6 @@
 import unittest
 
-from text_to_html import text_node_to_html_node, split_nodes_delimiter
+from text_to_html import text_node_to_html_node, split_nodes_delimiter, extract_markdown_images, extract_markdown_links
 from textnode import TextNode, TextType
 
 class TestTextToHTMLFunc(unittest.TestCase):
@@ -68,6 +68,20 @@ class SplitNodesDelimiterFunc(unittest.TestCase):
         test_node_2 = TextNode("My name is `Dakota`!", TextType.CODE)
         new_nodes = split_nodes_delimiter([test_node_1, test_node_2], "`", TextType.CODE)
         self.assertEqual(new_nodes, [TextNode("Hello `world`, ", TextType.CODE), TextNode("My name is `Dakota`!", TextType.CODE)]) 
+
+class ExtractMarkdownImagesFunc(unittest.TestCase):
+    def test_extract_markdown_images(self):
+        matches = extract_markdown_images(
+            "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png)"
+        )
+        self.assertListEqual([("image", "https://i.imgur.com/zjjcJKZ.png")], matches)
+
+class ExtractMarkdownLinksFunc(unittest.TestCase):
+    def test_extract_markdown_links(self):
+        matches = extract_markdown_links(
+            "This is text that goes [to boot.dev](https://www.boot.dev)"
+        )
+        self.assertListEqual([("to boot.dev", "https://www.boot.dev")], matches)
 
 if __name__ == "__main__":
     unittest.main()
