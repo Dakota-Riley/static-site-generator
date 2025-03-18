@@ -1,6 +1,6 @@
 import unittest
 
-from text_to_html import text_node_to_html_node, extract_markdown_images, extract_markdown_links
+from text_to_html import text_node_to_html_node
 from textnode import TextNode, TextType
 
 class TestTextToHTMLFunc(unittest.TestCase):

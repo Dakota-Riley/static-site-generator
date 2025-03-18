@@ -28,3 +28,6 @@ class SplitNodesDelimiterFunc(unittest.TestCase):
         test_node_2 = TextNode("My name is `Dakota`!", TextType.CODE)
         new_nodes = split_nodes_delimiter([test_node_1, test_node_2], "`", TextType.CODE)
         self.assertEqual(new_nodes, [TextNode("Hello `world`, ", TextType.CODE), TextNode("My name is `Dakota`!", TextType.CODE)]) 
+
+if __name__ == "__main__":
+    unittest.main()
