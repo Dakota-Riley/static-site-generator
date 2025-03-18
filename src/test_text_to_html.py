@@ -1,6 +1,6 @@
 import unittest
 
-from text_to_html import text_node_to_html_node, split_nodes_delimiter, extract_markdown_images, extract_markdown_links
+from text_to_html import text_node_to_html_node, extract_markdown_images, extract_markdown_links
 from textnode import TextNode, TextType
 
 class TestTextToHTMLFunc(unittest.TestCase):
@@ -42,46 +42,6 @@ class TestTextToHTMLFunc(unittest.TestCase):
         self.assertEqual(html_node.value, "")
         self.assertEqual(html_node.props["src"], "https://www.google.com")
         self.assertEqual(html_node.props["alt"], "This is an image node")
-
-class SplitNodesDelimiterFunc(unittest.TestCase):
-
-    def test_text(self):
-        test_node_1 = TextNode("Hello world, ", TextType.TEXT)
-        test_node_2 = TextNode("My name is Dakota!", TextType.TEXT)
-        new_nodes = split_nodes_delimiter([test_node_1, test_node_2], "", TextType.TEXT)
-        self.assertEqual(new_nodes, [TextNode("Hello world, ", TextType.TEXT), TextNode("My name is Dakota!", TextType.TEXT)]) 
-
-    def test_bold(self):
-        test_node_1 = TextNode("Hello **world**, ", TextType.BOLD)
-        test_node_2 = TextNode("My name is **Dakota**!", TextType.BOLD)
-        new_nodes = split_nodes_delimiter([test_node_1, test_node_2], "**", TextType.BOLD)
-        self.assertEqual(new_nodes, [TextNode("Hello **world**, ", TextType.BOLD), TextNode("My name is **Dakota**!", TextType.BOLD)]) 
-
-    def test_italics(self):
-        test_node_1 = TextNode("Hello _world_, ", TextType.ITALIC)
-        test_node_2 = TextNode("My name is _Dakota_!", TextType.ITALIC)
-        new_nodes = split_nodes_delimiter([test_node_1, test_node_2], "", TextType.ITALIC)
-        self.assertEqual(new_nodes, [TextNode("Hello _world_, ", TextType.ITALIC), TextNode("My name is _Dakota_!", TextType.ITALIC)]) 
-
-    def test_code(self):
-        test_node_1 = TextNode("Hello `world`, ", TextType.CODE)
-        test_node_2 = TextNode("My name is `Dakota`!", TextType.CODE)
-        new_nodes = split_nodes_delimiter([test_node_1, test_node_2], "`", TextType.CODE)
-        self.assertEqual(new_nodes, [TextNode("Hello `world`, ", TextType.CODE), TextNode("My name is `Dakota`!", TextType.CODE)]) 
-
-class ExtractMarkdownImagesFunc(unittest.TestCase):
-    def test_extract_markdown_images(self):
-        matches = extract_markdown_images(
-            "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png)"
-        )
-        self.assertListEqual([("image", "https://i.imgur.com/zjjcJKZ.png")], matches)
-
-class ExtractMarkdownLinksFunc(unittest.TestCase):
-    def test_extract_markdown_links(self):
-        matches = extract_markdown_links(
-            "This is text that goes [to boot.dev](https://www.boot.dev)"
-        )
-        self.assertListEqual([("to boot.dev", "https://www.boot.dev")], matches)
 
 if __name__ == "__main__":
     unittest.main()
