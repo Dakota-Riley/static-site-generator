@@ -12,10 +12,14 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
         
         split_text = node.text.split(delimiter)
 
-        for index, part in enumerate(split_text):
-            if index % 2 == 0:
-                new_nodes.append(TextNode(part, TextType.TEXT))
+        for i in range(len(split_text)):
+            if split_text[i] == "":
+                continue  # Skip empty strings
+
+            if i % 2 == 0:
+                if split_text[i]:
+                    new_nodes.append(TextNode(split_text[i], TextType.TEXT))
             else: 
-                new_nodes.append(TextNode(part, text_type))
+                new_nodes.append(TextNode(split_text[i], text_type))
 
     return new_nodes
