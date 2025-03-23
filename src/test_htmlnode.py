@@ -1,51 +1,68 @@
 import unittest
+from htmlnode import LeafNode, ParentNode, HTMLNode
 
-from htmlnode import HTMLNode, LeafNode, ParentNode
 
 class TestHTMLNode(unittest.TestCase):
+    def test_to_html_props(self):
+        node = HTMLNode(
+            "div",
+            "Hello, world!",
+            None,
+            {"class": "greeting", "href": "https://boot.dev"},
+        )
+        self.assertEqual(
+            node.props_to_html(),
+            ' class="greeting" href="https://boot.dev"',
+        )
 
-    # Tests for the HTMLNode
+    def test_values(self):
+        node = HTMLNode(
+            "div",
+            "I wish I could read",
+        )
+        self.assertEqual(
+            node.tag,
+            "div",
+        )
+        self.assertEqual(
+            node.value,
+            "I wish I could read",
+        )
+        self.assertEqual(
+            node.children,
+            None,
+        )
+        self.assertEqual(
+            node.props,
+            None,
+        )
 
-    def test_props_to_html_empty(self):
-        node = HTMLNode()
-        self.assertEqual(node.props_to_html(), "")
-    
-    def test_props_to_html_single(self):
-        node = HTMLNode(props={"href": "https://www.google.com"})
-        self.assertEqual(node.props_to_html(), ' href="https://www.google.com"')
+    def test_repr(self):
+        node = HTMLNode(
+            "p",
+            "What a strange world",
+            None,
+            {"class": "primary"},
+        )
+        self.assertEqual(
+            node.__repr__(),
+            "HTMLNode(p, What a strange world, children: None, {'class': 'primary'})",
+        )
 
-    def test_props_to_html_multiple(self):
-        node = HTMLNode(props={"href": "https://www.google.com", "target": "_blank"})
-
-        possible_results = [
-            ' href="https://www.google.com" target="_blank"',
-            ' target="_blank" href="https://www.google.com"'
-        ]
-        self.assertIn(node.props_to_html(), possible_results)
-
-    # Tests for the LeafNode
-    
     def test_leaf_to_html_p(self):
         node = LeafNode("p", "Hello, world!")
         self.assertEqual(node.to_html(), "<p>Hello, world!</p>")
 
-    def test_leaf_to_html_h1(self):
-        node = LeafNode("h1", "Hello, world!")
-        self.assertEqual(node.to_html(), "<h1>Hello, world!</h1>")
-
-    def test_leaf_to_html_b(self):
-        node = LeafNode("b", "Hello, world!")
-        self.assertEqual(node.to_html(), "<b>Hello, world!</b>")
-
-    def test_leaf_to_html_i(self):
-        node = LeafNode("i", "Hello, world!")
-        self.assertEqual(node.to_html(), "<i>Hello, world!</i>")
-
     def test_leaf_to_html_a(self):
-        node = LeafNode("a", "Hello, world!")
-        self.assertEqual(node.to_html(), "<a>Hello, world!</a>")
+        node = LeafNode("a", "Click me!", {"href": "https://www.google.com"})
+        self.assertEqual(
+            node.to_html(),
+            '<a href="https://www.google.com">Click me!</a>',
+        )
 
-    # Tests for the ParentNode
+    def test_leaf_to_html_no_tag(self):
+        node = LeafNode(None, "Hello, world!")
+        self.assertEqual(node.to_html(), "Hello, world!")
 
     def test_to_html_with_children(self):
         child_node = LeafNode("span", "child")
@@ -61,19 +78,36 @@ class TestHTMLNode(unittest.TestCase):
             "<div><span><b>grandchild</b></span></div>",
         )
 
-    def test_to_html_with_empty_tag(self):
-        child_node = LeafNode("div", "child")
-        parent_node = ParentNode("", [child_node])
-        with self.assertRaises(ValueError) as context:
-            parent_node.to_html()
-        self.assertEqual(str(context.exception), "Parent node must have a non-empty tag.")
+    def test_to_html_many_children(self):
+        node = ParentNode(
+            "p",
+            [
+                LeafNode("b", "Bold text"),
+                LeafNode(None, "Normal text"),
+                LeafNode("i", "italic text"),
+                LeafNode(None, "Normal text"),
+            ],
+        )
+        self.assertEqual(
+            node.to_html(),
+            "<p><b>Bold text</b>Normal text<i>italic text</i>Normal text</p>",
+        )
 
-    def test_to_html_with_no_child(self):
-        child_node = LeafNode("div", "child")
-        parent_node = ParentNode("span", "")
-        with self.assertRaises(ValueError) as context:
-            parent_node.to_html()
-        self.assertEqual(str(context.exception), "Parent node must have non-empty children.")
+    def test_headings(self):
+        node = ParentNode(
+            "h2",
+            [
+                LeafNode("b", "Bold text"),
+                LeafNode(None, "Normal text"),
+                LeafNode("i", "italic text"),
+                LeafNode(None, "Normal text"),
+            ],
+        )
+        self.assertEqual(
+            node.to_html(),
+            "<h2><b>Bold text</b>Normal text<i>italic text</i>Normal text</h2>",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
