@@ -1,6 +1,14 @@
 import os
 import shutil
 
+from markdown_blocks import (
+    markdown_to_blocks,
+    markdown_to_html_node,
+    BlockType
+)
+
+from htmlnode import HTMLNode
+
 def copy_static_to_public(source_path, destination_path, is_root_call=True):
     # Print what we're currently processing
     print(f"Processing: {source_path}")
@@ -35,5 +43,49 @@ def copy_static_to_public(source_path, destination_path, is_root_call=True):
             # For example: shutil.copy(source_item_path, dest_item_path)
             shutil.copy(source_item_path, dest_item_path)
 
+def extract_title(markdown):
+    blocks = markdown_to_blocks(markdown)
+    for block in blocks:
+        lines = block.split("\n")
+        for line in lines:
+            if line.startswith("# "):
+                # Remove the "# " and strip any leading/trailing whitespace
+                return line[2:].strip()
+    raise Exception("No H1 header found in the markdown")
+
+def generate_page(from_path, template_path, dest_path):
+    print(f"Generating page from {from_path} to {dest_path} using {template_path}.")
+
+    # Read the markdown file
+    with open(from_path, mode="r") as file:
+        markdown = file.read()
+        file.close()
+    
+    # Read the template file
+    with open(template_path, mode="r") as file:
+        template = file.read()
+        file.close()
+    
+    # Convert markdown to HTML
+    content = markdown_to_html_node(markdown).to_html()
+
+    # Extract title
+    title = extract_title(markdown)
+
+    # Replace placeholders 
+    final_html = template.replace("{{ Title }}", title).replace("{{ Content }}", content)
+
+    # Create directory if it doesn't exist
+    directory = os.path.dirname(dest_path)
+    if directory and not os.path.exists(directory):
+        os.makedirs(directory)
+
+    # Write the final HTML to the destination
+    with open(dest_path, "w") as file:
+        file.write(final_html)
+        file.close()
+
+
 if __name__ == "__main__":
     copy_static_to_public("static", "public")
+    generate_page("content/index.md", "template.html", "public/index.html")
