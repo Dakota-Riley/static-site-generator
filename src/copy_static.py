@@ -18,7 +18,7 @@ def copy_static_to_public(source_path, destination_path, is_root_call=True):
         print(f"Starting copy from {source_path} to {destination_path}")
         if os.path.exists(destination_path):
             shutil.rmtree(destination_path)
-        os.mkdir(destination_path)
+        os.makedirs(destination_path)
     else:
         print(f"Processing subdirectory: {source_path}")
 
@@ -85,7 +85,34 @@ def generate_page(from_path, template_path, dest_path):
         file.write(final_html)
         file.close()
 
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+    directory_items = os.listdir(dir_path_content)
+    for item in os.listdir(dir_path_content):
+        print(f"Directory Item: {item}")
+
+        source_path = os.path.join(dir_path_content, item)
+        dest_path = os.path.join(dest_dir_path, item)
+        print(f"Source Path: {source_path}")
+        print(f"Destination Path: {dest_path}")
+
+        # Check item to see if it is a file
+        if os.path.isfile(source_path):
+            print(f"{item} is a file")
+            final_html = dest_path.replace(".md", ".html")
+
+            generate_page(source_path, template_path, final_html)
+            print("Page Generated")
+        
+        if os.path.isdir(source_path):
+            print(f"{item} is a directory")
+            generate_pages_recursive(source_path, template_path, dest_path)
+            print("New Subdirectory Generated")
+
 
 if __name__ == "__main__":
+    # This will delete and recreate the public directory
     copy_static_to_public("static", "public")
-    generate_page("content/index.md", "template.html", "public/index.html")
+    
+    # Generate pages
+    generate_pages_recursive("content", "template.html", "public")
+
